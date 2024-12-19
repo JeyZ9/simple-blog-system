@@ -43,10 +43,12 @@ public class Blog {
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Categories categories;
 
-    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Like> likes = new HashSet<>();
 
     public Blog(String title, String imageUrl, String description, User user, Categories categories, Set<Comment> comments, Set<Like> likes) {

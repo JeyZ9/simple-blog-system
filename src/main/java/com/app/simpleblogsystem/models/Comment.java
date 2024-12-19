@@ -24,7 +24,7 @@ public class Comment {
     private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blog_id", nullable = false)
+    @JoinColumn(name = "blog_id", referencedColumnName = "id", nullable = false)
     private Blog blog;
 
     public Comment(String comment){
