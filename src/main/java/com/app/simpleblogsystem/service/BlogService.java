@@ -1,5 +1,6 @@
 package com.app.simpleblogsystem.service;
 
+import com.app.simpleblogsystem.dto.BlogDTO;
 import com.app.simpleblogsystem.models.Blog;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +13,11 @@ public interface BlogService {
 
     Optional<Blog> findBlogById(Long id);
 
-    Blog createBlog();
+    BlogDTO createBlog(BlogDTO blogDTO);
 
-    Blog updateBlog(Long id, Blog blog);
+    BlogDTO updateBlog(Long id, BlogDTO blogDTO);
 
     void deleteBlog(Long id);
+
+    List<BlogDTO> getBlogByCategory(Long categoryId);
 }

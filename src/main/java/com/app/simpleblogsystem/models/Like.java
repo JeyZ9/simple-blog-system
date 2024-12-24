@@ -17,9 +17,13 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Boolean isLike;
+    private Boolean isLiked;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_id")
     private Blog blog;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 }

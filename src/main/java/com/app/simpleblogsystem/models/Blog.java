@@ -8,12 +8,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
-@Table(name = "blogs")
+// ข้อมูล title ต้องมีค่าที่ไม่ซ้ำกัน
+@Table(name = "blogs", uniqueConstraints = {@UniqueConstraint(columnNames = {"title"})})
 @Getter
 @Setter
 //@AllArgsConstructor
@@ -49,9 +48,9 @@ public class Blog {
 
 //    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Like> likes = new HashSet<>();
+    private List<Like> likes = new ArrayList<>();
 
-    public Blog(String title, String imageUrl, String description, User user, Categories categories, Set<Comment> comments, Set<Like> likes) {
+    public Blog(String title, String imageUrl, String description, User user, Categories categories, Set<Comment> comments, List<Like> likes) {
         this.title = title;
         this.imageUrl = imageUrl;
         this.description = description;

@@ -1,7 +1,6 @@
 package com.app.simpleblogsystem.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,8 +26,14 @@ public class Comment {
     @JoinColumn(name = "blog_id", referencedColumnName = "id", nullable = false)
     private Blog blog;
 
-    public Comment(String comment){
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
+
+    public Comment(String comment, Blog blog, User user) {
         this.comment = comment;
+        this.blog = blog;
+        this.user = user;
         this.date = new Date();
     }
 }
