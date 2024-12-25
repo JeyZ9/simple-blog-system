@@ -13,7 +13,11 @@ public class CommentDTO {
 
     private String comment;
 
-    private Date date;
+//    private Date date;
 
     private User user;
+
+    public String getComment() {
+        return comment;
+    }
 }

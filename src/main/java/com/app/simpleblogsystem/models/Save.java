@@ -17,10 +17,12 @@ public class Save {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "saves")
-    private User user;
+//    @OneToOne(mappedBy = "saves", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User users;
 
     @ManyToOne
-    @JoinColumn(name = "blog_id", referencedColumnName = "id")
-    private Blog blog;
+    @JoinColumn(name = "blog_id", referencedColumnName = "id", nullable = false)
+    private Blog blogs;
 }

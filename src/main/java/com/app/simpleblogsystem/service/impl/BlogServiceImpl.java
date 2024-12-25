@@ -3,7 +3,6 @@ package com.app.simpleblogsystem.service.impl;
 import com.app.simpleblogsystem.dto.BlogDTO;
 import com.app.simpleblogsystem.exception.ResourceNotFoundException;
 import com.app.simpleblogsystem.models.Blog;
-import com.app.simpleblogsystem.models.Categories;
 import org.modelmapper.ModelMapper;
 import com.app.simpleblogsystem.repository.*;
 import com.app.simpleblogsystem.service.BlogService;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -69,15 +67,16 @@ public class BlogServiceImpl implements BlogService {
         blogRepository.delete(blogId);
     }
 
-    @Override
-    public List<BlogDTO> getBlogByCategory(Long categoryId){
-        Categories category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
-
-        List<Blog> blogList = blogRepository.findByCategory(category);
-
-        return blogList.stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
-
+    // ติดแก้ blogRepository join table หา categoryId == categoryId
+//    @Override
+//    public List<BlogDTO> getBlogByCategory(Long categoryId){
+//        Categories category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+//
+//        List<Blog> blogList = blogRepository.findBycategories(category.getId());
+//
+//        return blogList.stream().map(this::mapToDTO).collect(Collectors.toList());
+//    }
+//
     private Blog mapToBlog(BlogDTO blogDTO) {
         return modelMapper.map(blogDTO, Blog.class);
     }

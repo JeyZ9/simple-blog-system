@@ -22,7 +22,7 @@ public class Blog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Title cannot be empty")
     private String title;
 
     private String imageUrl;
@@ -32,32 +32,45 @@ public class Blog {
     @Column(name = "date_time")
     private Date dateTime;
 
-    @NotEmpty
+    @NotEmpty(message = "User cannot be empty")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    @NotEmpty
+    @NotEmpty(message = "Category cannot be empty")
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
-    private Categories categories;
+    private Category category;
 
-//    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 
-//    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();
 
-    public Blog(String title, String imageUrl, String description, User user, Categories categories, Set<Comment> comments, List<Like> likes) {
+    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Save> saves;
+
+    public Blog(String title, String imageUrl, String description, User user, Category category) {
         this.title = title;
         this.imageUrl = imageUrl;
         this.description = description;
-        this.dateTime = new Date();
         this.user = user;
-        this.categories = categories;
-        this.comments = comments;
-        this.likes = likes;
+        this.category = category;
+        this.dateTime = new Date();
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

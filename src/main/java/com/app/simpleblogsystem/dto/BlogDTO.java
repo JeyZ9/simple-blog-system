@@ -24,4 +24,16 @@ public class BlogDTO {
     private Set<CommentDTO> comments;
 
     private Set<LikeDTO> likes;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
 }

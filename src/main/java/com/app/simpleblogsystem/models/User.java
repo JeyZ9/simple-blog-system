@@ -23,18 +23,20 @@ public class User {
     private Long id;
 
     @NotBlank
-    @Column(name = "username", length = 155)
+    @Column(name = "username", length = 155, unique = true)
     private String username;
 
     @Email
+    @Column(name = "email", unique = true)
     private String email;
 
     @NotBlank
     @JsonIgnore
     private String password;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "save_id", referencedColumnName = "id")
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "save_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private Save saves;
 
     @ManyToMany(fetch = FetchType.EAGER)

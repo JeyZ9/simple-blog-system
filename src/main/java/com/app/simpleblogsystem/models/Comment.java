@@ -22,17 +22,19 @@ public class Comment {
 
     private Date date;
 
+//    @ManyToOne()
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_id", referencedColumnName = "id", nullable = false)
-    private Blog blog;
+    private Blog blogs;
 
+//    @ManyToOne()
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    public Comment(String comment, Blog blog, User user) {
+    public Comment(String comment, Blog blogs, User user) {
         this.comment = comment;
-        this.blog = blog;
+        this.blogs = blogs;
         this.user = user;
         this.date = new Date();
     }
