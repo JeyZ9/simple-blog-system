@@ -33,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDTO> findByBlogId(Long blogId) {
+    public List<CommentDTO> getCommentByBlogId(Long blogId) {
         List<Comment> comments = commentRepository.findByBlogsId(blogId);
         return comments.stream().map(this::mapToDTO).collect(Collectors.toList());
     }

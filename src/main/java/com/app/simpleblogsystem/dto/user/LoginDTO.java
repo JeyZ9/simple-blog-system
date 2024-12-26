@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class LoginDTO {
     @NotEmpty
-    private String username;
+    private String email;
 
     @NotEmpty
     private String password;

@@ -1,11 +1,12 @@
 package com.app.simpleblogsystem.dto.save;
 
-import com.app.simpleblogsystem.dto.BlogDTO;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-
+@Setter
+@Getter
 public class UserSaveBlogsDTO {
     private Long id;
     private Long userId;
-    private List<BlogDTO> blogDTOs;
+    private Long blogId;
 }

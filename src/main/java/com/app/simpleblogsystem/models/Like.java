@@ -20,7 +20,7 @@ public class Like {
     private Boolean isLiked;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blog_id")
+    @JoinColumn(name = "blog_id", referencedColumnName = "id", nullable = false)
     private Blog blogs;
 
     @OneToOne(fetch = FetchType.LAZY)
