@@ -7,10 +7,20 @@ import org.modelmapper.ModelMapper;
 import com.app.simpleblogsystem.repository.*;
 import com.app.simpleblogsystem.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -18,21 +28,42 @@ public class BlogServiceImpl implements BlogService {
     private final BlogRepository blogRepository;
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepository;
+    private final LikeRepository likeRepository;
+
+    @Value("${upload-dir}")
+    private String uploadDir;
 
     @Autowired
-    public  BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper, CategoryRepository categoryRepository) {
+    public  BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, LikeRepository likeRepository) {
         this.blogRepository = blogRepository;
         this.modelMapper = modelMapper;
         this.categoryRepository = categoryRepository;
+        this.likeRepository = likeRepository;
     }
 
     @Override
-    public List<Blog> findAllBlog(){
-        return blogRepository.findAll();
+    public List<BlogDTO> getAllBlog(){
+        List<Blog> blogList = blogRepository.findAll();
+        List<BlogDTO> blogDTOs = new ArrayList<>();
+        for(Blog blog : blogList){
+            BlogDTO blogDTO = new BlogDTO();
+//            List<Like> like = likeRepository.findAllByBlogs(blog);
+//            List<LikeDTO> likeDTO = like.stream().map(i -> new LikeDTO(i.getId(), i.getUsers().getUsername(), i.getIsLiked())).collect(Collectors.toList());
+            blogDTO.setId(blog.getId());
+            blogDTO.setWriter(blog.getUser().getUsername());
+            blogDTO.setTitle(blog.getTitle());
+            blogDTO.setCategory(blog.getCategory());
+            blogDTO.setDescription(blog.getDescription());
+            blogDTO.setCreatedDate(blog.getDateTime());
+//            blogDTO.setLikes(likeDTO);
+            blogDTO.setImageUrl(blog.getImageUrl());
+            blogDTOs.add(blogDTO);
+        }
+        return blogDTOs;
     }
 
     @Override
-    public Optional<Blog> findBlogById(Long id){
+    public Optional<Blog> getBlogById(Long id){
         Optional<Blog> blogOptional = blogRepository.findById(id);
         if (blogOptional.isPresent()){
             return blogOptional;
@@ -40,24 +71,45 @@ public class BlogServiceImpl implements BlogService {
         return Optional.empty();
     }
 
+
+//    @Override
+//    public Blog createBlog(Blog blog, MultipartFile image) throws IOException {
+//        Blog newBlog = new Blog();
+//        if(image != null) {
+//            newBlog.setImageUrl(saveFile(image));
+//        }else{
+//            newBlog.setImageUrl("noimg.jpg");
+//        }
+//        return blogRepository.save(blog);
+//    }
     @Override
-    public BlogDTO createBlog(BlogDTO blogDTO){
-        Blog blog = mapToBlog(blogDTO);
-        Blog newBlog = blogRepository.save(blog);
-        return mapToDTO(newBlog);
+    public Blog createBlog(Blog blog, MultipartFile image) throws IOException {
+//        Blog newBlog = new Blog();
+        if(image.isEmpty()) {
+            blog.setImageUrl("noimg.jpg");
+        }else{
+            blog.setImageUrl(saveFile(image));
+        }
+        return blogRepository.save(blog);
+//        Blog addedBlog = blogRepository.save(newBlog);
+//        return ;
     }
 
     @Override
-    public BlogDTO updateBlog(Long id, BlogDTO blogDTO){
-        Blog blog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id));
+    public Blog updateBlog(Long id, Blog blog, MultipartFile image) throws IOException {
+        Blog findBlog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id));
 
-        blog.setTitle(blogDTO.getTitle());
-        blog.setDescription(blogDTO.getDescription());
-        blog.setImageUrl(blogDTO.getImageUrl());
+        findBlog.setTitle(blog.getTitle());
+        findBlog.setDescription(blog.getDescription());
+        if(image != null){
+            String newFileName = saveFile(image);
+            deleteFile(findBlog.getImageUrl());
+            findBlog.setImageUrl(newFileName);
+        }
 
-        Blog updateBlog = blogRepository.save(blog);
+        Blog updateBlog = blogRepository.save(findBlog);
 
-        return mapToDTO(updateBlog);
+        return updateBlog;
     }
 
     @Override
@@ -77,12 +129,41 @@ public class BlogServiceImpl implements BlogService {
 //        return blogList.stream().map(this::mapToDTO).collect(Collectors.toList());
 //    }
 //
-    private Blog mapToBlog(BlogDTO blogDTO) {
-        return modelMapper.map(blogDTO, Blog.class);
+//    private Blog mapToBlog(BlogDTO blogDTO) {
+//        return modelMapper.map(blogDTO, Blog.class);
+//    }
+//
+//    private BlogDTO mapToDTO(Blog blog){
+//        return modelMapper.map(blog, BlogDTO.class);
+//    }
+
+    private String saveFile(MultipartFile file) throws IOException {
+        String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+        Path filePath = Paths.get(uploadDir, fileName);
+
+        if(!Files.exists(filePath.getParent())){
+            Files.createDirectories(filePath.getParent());
+        }
+
+        try {
+            FileOutputStream fos = new FileOutputStream(filePath.toFile());
+            fos.write(file.getBytes());
+        }catch (FileNotFoundException e){
+            throw new FileNotFoundException(e.getMessage());
+        }
+
+        return fileName;
     }
 
-    private BlogDTO mapToDTO(Blog blog){
-        return modelMapper.map(blog, BlogDTO.class);
+    private void deleteFile(String fileName) throws IOException {
+        if(fileName != "noimg.jpg"){
+            Path filePath = Paths.get(uploadDir, fileName);
+            try{
+                Files.deleteIfExists(filePath);
+            }catch (IOException e) {
+                throw new IOException(e.getMessage());
+            }
+        }
     }
 
 }

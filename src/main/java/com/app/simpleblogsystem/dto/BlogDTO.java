@@ -1,8 +1,11 @@
 package com.app.simpleblogsystem.dto;
 
+import com.app.simpleblogsystem.models.Category;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -17,23 +20,27 @@ public class BlogDTO {
 
     private String description;
 
-    private Long userId;
+    private String writer;
 
-    private Long categoryId;
+    private Category category;
 
-    private Set<CommentDTO> comments;
+    private String createdDate;
 
-    private Set<LikeDTO> likes;
+//    private List<CommentDTO> comments;
 
-    public String getTitle() {
-        return title;
-    }
+//    private List<LikeDTO> likes;
 
-    public String getDescription() {
-        return description;
-    }
+//    public String getTitle() {
+//        return title;
+//    }
+//
+//    public String getDescription() {
+//        return description;
+//    }
+//
+//    public String getImageUrl() {
+//        return imageUrl;
+//    }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
+//    public BlogDTO(Long id, String title, String description){}
 }

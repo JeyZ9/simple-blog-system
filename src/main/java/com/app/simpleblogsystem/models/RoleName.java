@@ -1,5 +1,5 @@
 package com.app.simpleblogsystem.models;
 
-enum RoleName{
+public enum RoleName{
     USER,MANAGER,ADMIN
 }

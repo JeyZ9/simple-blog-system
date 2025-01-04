@@ -37,7 +37,8 @@ public class LikeServiceImpl implements LikeService {
     @Override
     @Transactional(readOnly = true)
     public List<LikeDTO> getLikeByBlogId(Long blogId) {
-        List<Like> likeList = likeRepository.findAllByBlogId(blogId);
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
+        List<Like> likeList = likeRepository.findAllByBlogs(blog);
         return likeList.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
@@ -48,21 +49,34 @@ public class LikeServiceImpl implements LikeService {
         Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
         like.setBlogs(blog);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        like.setUser(user);
+        like.setUsers(user);
         like.setIsLiked(likeDTO.getIsLiked());
         Like newLike = likeRepository.save(like);
         return mapToDTO(newLike);
     }
 
+//    @Override
+//    @Transactional
+//    public LikeDTO updateLike(Long likeId, Long blogId, Long userId, LikeDTO likeDTO){
+//        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
+////        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+////        Like like = likeRepository.findLike(likeId, blog.getId(), user.getId());
+//        Like like = likeRepository.findLike(blog.getId());
+//        if(Objects.isNull(like)){
+//            throw new ResourceNotFoundException("Like", "id", likeId);
+//        }
+//        like.setIsLiked(likeDTO.getIsLiked());
+//        Like updatedLike = likeRepository.save(like);
+//        return mapToDTO(updatedLike);
+//    }
+
     @Override
     @Transactional
-    public LikeDTO updateLike(Long likeId, Long blogId, Long userId, LikeDTO likeDTO){
-        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        Like like = likeRepository.findLike(likeId, blog.getId(), user.getId());
-        if(Objects.isNull(like)){
-            throw new ResourceNotFoundException("Like", "id", likeId);
-        }
+    public LikeDTO updateLike(Long blogId, LikeDTO likeDTO) {
+        Blog blog = blogRepository.findById(blogId)
+                .orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
+        Like like = likeRepository.findByBlogs(blog)
+                .orElseThrow(() -> new ResourceNotFoundException("Like", "blogId", blogId));
         like.setIsLiked(likeDTO.getIsLiked());
         Like updatedLike = likeRepository.save(like);
         return mapToDTO(updatedLike);

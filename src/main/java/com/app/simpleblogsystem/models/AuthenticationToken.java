@@ -32,4 +32,12 @@ public class AuthenticationToken {
         this.createdDate = new Date();
         this.user = user;
     }
+
+//    public Long getId(){
+//        return id;
+//    }
+//
+//    public String getToken(){
+//        return token;
+//    }
 }

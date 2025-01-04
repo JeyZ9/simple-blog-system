@@ -1,9 +1,11 @@
 package com.app.simpleblogsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 //import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,14 +32,15 @@ public class Blog {
     private String description;
 
     @Column(name = "date_time")
-    private Date dateTime;
+    private String dateTime;
 
-    @NotEmpty(message = "User cannot be empty")
+    @JsonIgnore
+    @NotNull(message = "User cannot be empty")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    @NotEmpty(message = "Category cannot be empty")
+    @NotNull(message = "Category cannot be empty")
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
@@ -50,27 +53,30 @@ public class Blog {
 //    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Save> saves;
+    @JsonIgnore
+//    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+//    private Save saves;
+    private Set<Save> saves = new HashSet<>();
 
-    public Blog(String title, String imageUrl, String description, User user, Category category) {
+    public Blog(String title, String imageUrl, String description, User user, Category category, String dateTime) {
         this.title = title;
         this.imageUrl = imageUrl;
         this.description = description;
         this.user = user;
         this.category = category;
-        this.dateTime = new Date();
+        this.dateTime = dateTime;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+//    public void setTitle(String title) {
+//        this.title = title;
+//    }
+//
+//    public void setDescription(String description) {
+//        this.description = description;
+//    }
+//
+//    public void setImageUrl(String imageUrl) {
+//        this.imageUrl = imageUrl;
+//    }
 }

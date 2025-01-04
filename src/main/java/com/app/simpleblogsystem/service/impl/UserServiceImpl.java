@@ -6,15 +6,16 @@ import com.app.simpleblogsystem.dto.user.RegisterDTO;
 import com.app.simpleblogsystem.dto.user.UserResponseDTO;
 import com.app.simpleblogsystem.exception.AuthenticationFailException;
 import com.app.simpleblogsystem.exception.CustomException;
-import com.app.simpleblogsystem.exception.ResourceNotFoundException;
 import com.app.simpleblogsystem.models.AuthenticationToken;
 import com.app.simpleblogsystem.models.Role;
+import com.app.simpleblogsystem.models.RoleName;
 import com.app.simpleblogsystem.models.User;
 import com.app.simpleblogsystem.repository.RoleRepository;
 import com.app.simpleblogsystem.repository.UserRepository;
 import com.app.simpleblogsystem.service.AuthenticationService;
 import com.app.simpleblogsystem.service.UserService;
 import jakarta.xml.bind.DatatypeConverter;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
     private final RoleRepository roleRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService, RoleRepository roleRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.authenticationService = authenticationService;
         this.roleRepository = roleRepository;
+        this.modelMapper = modelMapper;
     }
 
     Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -53,9 +56,14 @@ public class UserServiceImpl implements UserService {
             logger.error("hashing password failed {}", e.getMessage());
         }
 
-//        Role role = roleRepository.findRoleByName("USER").orElseThrow(() -> new RuntimeException("Role not found!"));
+        Role role = roleRepository.findRoleByRoleName(RoleName.USER).orElseThrow(() -> new RuntimeException("Role not found!"));
 
-        User user = new User(registerDTO.getUsername(), registerDTO.getEmail(), encryptedPassword);
+//        User user = new User(registerDTO.getUsername(), registerDTO.getEmail(), encryptedPassword);
+        User user = mapToUser(registerDTO);
+        user.setUsername(registerDTO.getUsername());
+        user.setEmail(registerDTO.getEmail());
+        user.setPassword(encryptedPassword);
+        user.getRoles().add(role);
         try {
             userRepository.save(user);
             final AuthenticationToken authToken = new AuthenticationToken(user);
@@ -99,6 +107,8 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
+    public User mapToUser(RegisterDTO register) {
+        return modelMapper.map(register, User.class);
+    }
 
 }

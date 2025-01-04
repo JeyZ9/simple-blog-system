@@ -7,5 +7,6 @@ import java.util.List;
 public interface LikeService {
     List<LikeDTO> getLikeByBlogId(Long blogId);
     LikeDTO createLike(Long blogId, Long userId, LikeDTO likeDTO);
-    LikeDTO updateLike(Long likeId, Long blogId, Long userId, LikeDTO likeDTO);
+//    LikeDTO updateLike(Long likeId, Long blogId, Long userId, LikeDTO likeDTO);
+    LikeDTO updateLike(Long blogId, LikeDTO likeDTO);
 }

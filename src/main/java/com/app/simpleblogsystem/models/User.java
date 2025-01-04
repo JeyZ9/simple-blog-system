@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -34,10 +37,11 @@ public class User {
     @JsonIgnore
     private String password;
 
-//    @OneToOne(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
+    private Set<Save> save = new HashSet<>();
 //    @JoinColumn(name = "save_id", referencedColumnName = "id")
-    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Save saves;
+//    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<Save> save = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -45,7 +49,12 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
-    public User(String username, String email, String password){}
+    public User(String username, String email, String password){
+        this.username = username;
+        this.email = email;
+        this.password = password;
+//        this.roles = roles;
+    }
 }
