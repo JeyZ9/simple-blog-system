@@ -46,6 +46,20 @@ public class BlogController {
         return new ResponseEntity<>(new ApiResponse<>(200, MessageStrings.SUCCESS_GET, getBlogs), HttpStatus.OK);
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<Object>> getAllBlogByUserId(@PathVariable("userId") Long userId){
+        List<BlogDTO> getBlogs = blogService.getBlogByUserId(userId);
+        ApiResponse<Object> response = new ApiResponse<>(200, MessageStrings.SUCCESS_GET, getBlogs);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ApiResponse<Object>> getAllBlogByCategoryId(@PathVariable("categoryId") Long categoryId){
+        List<BlogDTO> getBlogs = blogService.getBlogByCategoryId(categoryId);
+        ApiResponse<Object> response = new ApiResponse<>(200, MessageStrings.SUCCESS_GET, getBlogs);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Object>> getBlogById(@PathVariable Long id) {
         Blog blogOptional = blogService.getBlogById(id).orElseThrow(() -> new RuntimeException("Blog id not found!"));

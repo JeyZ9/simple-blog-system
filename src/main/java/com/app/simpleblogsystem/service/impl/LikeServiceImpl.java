@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -35,10 +36,10 @@ public class LikeServiceImpl implements LikeService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+//    @Transactional(readOnly = true)
     public List<LikeDTO> getLikeByBlogId(Long blogId) {
         Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
-        List<Like> likeList = likeRepository.findAllByBlogs(blog);
+        List<Like> likeList = likeRepository.findAllByBlogs_Id(blog.getId());
         return likeList.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
@@ -72,11 +73,15 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     @Transactional
-    public LikeDTO updateLike(Long blogId, LikeDTO likeDTO) {
+    public LikeDTO updateLike(Long blogId, Long likeId, LikeDTO likeDTO, Long userId) throws IOException {
         Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
         Like like = likeRepository.findByBlogs(blog)
                 .orElseThrow(() -> new ResourceNotFoundException("Like", "blogId", blogId));
+//        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        if (!like.getUsers().getId().equals(userId)){
+            throw new IOException("UserId is not equal");
+        }
         like.setIsLiked(likeDTO.getIsLiked());
         Like updatedLike = likeRepository.save(like);
         return mapToDTO(updatedLike);

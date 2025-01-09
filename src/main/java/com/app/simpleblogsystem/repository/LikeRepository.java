@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
-//    List<Like> findAllByBlogs(Long blogId);
-    List<Like> findAllByBlogs(Blog blogs);
+    List<Like> findAllByBlogs_Id(Long blogId);
+//    List<Like> findAllByBlogs(Blog blogs);
     Optional<Like> findByBlogs(Blog blogs);
 }

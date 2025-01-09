@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface BlogService {
     List<BlogDTO> getAllBlog();
 
+    List<BlogDTO> getBlogByUserId(Long userId);
+
     Optional<Blog> getBlogById(Long id);
 
 //    BlogDTO createBlog(BlogDTO blogDTO);
@@ -21,5 +23,5 @@ public interface BlogService {
 
     void deleteBlog(Long id);
 
-//    List<BlogDTO> getBlogByCategory(Long categoryId);
+    List<BlogDTO> getBlogByCategoryId(Long categoryId);
 }

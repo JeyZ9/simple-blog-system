@@ -3,7 +3,9 @@ package com.app.simpleblogsystem.service.impl;
 import com.app.simpleblogsystem.dto.BlogDTO;
 import com.app.simpleblogsystem.exception.ResourceNotFoundException;
 import com.app.simpleblogsystem.models.Blog;
-import org.modelmapper.ModelMapper;
+//import org.modelmapper.ModelMapper;
+import com.app.simpleblogsystem.models.Category;
+import com.app.simpleblogsystem.models.User;
 import com.app.simpleblogsystem.repository.*;
 import com.app.simpleblogsystem.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +28,27 @@ import java.util.UUID;
 public class BlogServiceImpl implements BlogService {
 
     private final BlogRepository blogRepository;
-    private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final LikeRepository likeRepository;
+//    private final ModelMapper modelMapper;
+//    private final CategoryRepository categoryRepository;
+//    private final LikeRepository likeRepository;
 
     @Value("${upload-dir}")
     private String uploadDir;
 
     @Autowired
-    public  BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, LikeRepository likeRepository) {
+    public  BlogServiceImpl(BlogRepository blogRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
         this.blogRepository = blogRepository;
-        this.modelMapper = modelMapper;
+        this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
-        this.likeRepository = likeRepository;
     }
+//    public  BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, LikeRepository likeRepository) {
+//        this.blogRepository = blogRepository;
+//        this.modelMapper = modelMapper;
+//        this.categoryRepository = categoryRepository;
+//        this.likeRepository = likeRepository;
+//    }
 
     @Override
     public List<BlogDTO> getAllBlog(){
@@ -63,6 +72,44 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
+    public List<BlogDTO> getBlogByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        List<Blog> blogList = blogRepository.findAllByUserId(user.getId());
+        List<BlogDTO> blogDTOs = new ArrayList<>();
+        for(Blog blog : blogList){
+            BlogDTO blogDTO = new BlogDTO();
+            blogDTO.setId(blog.getId());
+            blogDTO.setWriter(blog.getUser().getUsername());
+            blogDTO.setTitle(blog.getTitle());
+            blogDTO.setCategory(blog.getCategory());
+            blogDTO.setDescription(blog.getDescription());
+            blogDTO.setCreatedDate(blog.getDateTime());
+            blogDTO.setImageUrl(blog.getImageUrl());
+            blogDTOs.add(blogDTO);
+        }
+        return blogDTOs;
+    }
+
+    @Override
+    public List<BlogDTO> getBlogByCategoryId(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("category", "id", categoryId));
+        List<Blog> blogList = blogRepository.findAllByCategoryId(category.getId());
+        List<BlogDTO> blogDTOs = new ArrayList<>();
+        for(Blog blog : blogList){
+            BlogDTO blogDTO = new BlogDTO();
+            blogDTO.setId(blog.getId());
+            blogDTO.setWriter(blog.getUser().getUsername());
+            blogDTO.setTitle(blog.getTitle());
+            blogDTO.setCategory(blog.getCategory());
+            blogDTO.setDescription(blog.getDescription());
+            blogDTO.setCreatedDate(blog.getDateTime());
+            blogDTO.setImageUrl(blog.getImageUrl());
+            blogDTOs.add(blogDTO);
+        }
+        return blogDTOs;
+    }
+
+    @Override
     public Optional<Blog> getBlogById(Long id){
         Optional<Blog> blogOptional = blogRepository.findById(id);
         if (blogOptional.isPresent()){
@@ -71,17 +118,6 @@ public class BlogServiceImpl implements BlogService {
         return Optional.empty();
     }
 
-
-//    @Override
-//    public Blog createBlog(Blog blog, MultipartFile image) throws IOException {
-//        Blog newBlog = new Blog();
-//        if(image != null) {
-//            newBlog.setImageUrl(saveFile(image));
-//        }else{
-//            newBlog.setImageUrl("noimg.jpg");
-//        }
-//        return blogRepository.save(blog);
-//    }
     @Override
     public Blog createBlog(Blog blog, MultipartFile image) throws IOException {
 //        Blog newBlog = new Blog();
@@ -91,8 +127,6 @@ public class BlogServiceImpl implements BlogService {
             blog.setImageUrl(saveFile(image));
         }
         return blogRepository.save(blog);
-//        Blog addedBlog = blogRepository.save(newBlog);
-//        return ;
     }
 
     @Override
@@ -118,24 +152,6 @@ public class BlogServiceImpl implements BlogService {
 
         blogRepository.delete(blogId);
     }
-
-    // ติดแก้ blogRepository join table หา categoryId == categoryId
-//    @Override
-//    public List<BlogDTO> getBlogByCategory(Long categoryId){
-//        Categories category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
-//
-//        List<Blog> blogList = blogRepository.findBycategories(category.getId());
-//
-//        return blogList.stream().map(this::mapToDTO).collect(Collectors.toList());
-//    }
-//
-//    private Blog mapToBlog(BlogDTO blogDTO) {
-//        return modelMapper.map(blogDTO, Blog.class);
-//    }
-//
-//    private BlogDTO mapToDTO(Blog blog){
-//        return modelMapper.map(blog, BlogDTO.class);
-//    }
 
     private String saveFile(MultipartFile file) throws IOException {
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();

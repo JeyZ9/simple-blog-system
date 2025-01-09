@@ -11,9 +11,14 @@ import com.app.simpleblogsystem.repository.UserRepository;
 import com.app.simpleblogsystem.service.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +28,8 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final BlogRepository blogRepository;
     private final ModelMapper modelMapper;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository, UserRepository userRepository, BlogRepository blogRepository, ModelMapper modelMapper) {
@@ -37,30 +44,50 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> comments = commentRepository.findByBlogsId(blogId);
         return comments.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
+//    @Override
+//    public List<Comment> getCommentByBlogId(Long blogId) {
+//        return commentRepository.findByBlogsId(blogId);
+//    }
 
     @Override
-    public CommentDTO createComment(CommentDTO commentDTO) {
+    public CommentDTO createComment(CommentDTO commentDTO, Long userId, Long blogId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "Id", blogId));
         Comment comment = mapToComment(commentDTO);
+        comment.setComment(commentDTO.getComment());
+        comment.setBlogs(blog);
+        comment.setUser(user);
+        comment.setCreatedDate(sdf.format(new Date()));
         Comment newComment = commentRepository.save(comment);
         return  mapToDTO(newComment);
     }
 
     @Override
-    public CommentDTO updateComment(Long commentId, Long userId, Long blogId, CommentDTO commentDTO) {
+    public CommentDTO updateComment(Long commentId, Long userId, Long blogId, CommentDTO commentDTO) throws IOException {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
-        comment.setComment(commentDTO.getComment());
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        comment.setUser(user);
-        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
-        comment.setBlogs(blog);
-        commentRepository.save(comment);
+        if (Objects.equals(comment.getUser().getId(), userId)) {
+            comment.setComment(commentDTO.getComment());
+            User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+            comment.setUser(user);
+            Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
+            comment.setBlogs(blog);
+            comment.setCreatedDate(sdf.format(new Date()));
+            commentRepository.save(comment);
+        }else {
+            throw new IOException("UserId is not equal");
+        }
         return mapToDTO(comment);
     }
 
     @Override
-    public void deleteComment(Long commentId) {
+    public Comment deleteComment(Long blogId, Long commentId) throws IOException {
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
         commentRepository.delete(comment);
+        if(!comment.getBlogs().getId().equals(blog.getId())){
+            throw new IOException("Comment dose not belong to post");
+        }
+        return comment;
     }
 
     private CommentDTO mapToDTO(Comment comment) {
@@ -70,4 +97,5 @@ public class CommentServiceImpl implements CommentService {
     private Comment mapToComment(CommentDTO commentDTO){
         return  modelMapper.map(commentDTO, Comment.class);
     }
+
 }

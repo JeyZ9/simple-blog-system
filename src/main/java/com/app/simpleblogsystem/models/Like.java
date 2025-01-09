@@ -23,7 +23,8 @@ public class Like {
     @JoinColumn(name = "blog_id", referencedColumnName = "id", nullable = false)
     private Blog blogs;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+//    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User users;
 }
