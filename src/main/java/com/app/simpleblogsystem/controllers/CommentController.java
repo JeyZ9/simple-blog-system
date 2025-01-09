@@ -53,7 +53,7 @@ public class CommentController {
         CommentDTO commentDTO = new CommentDTO();
         commentDTO.setComment(comment);
         CommentDTO updateComment = commentService.updateComment(commentId, userId, blogId, commentDTO);
-        ApiResponse<Object> response = new ApiResponse(201, MessageStrings.SUCCESS_UPDATE, updateComment);
+        ApiResponse<Object> response = new ApiResponse<>(201, MessageStrings.SUCCESS_UPDATE, updateComment);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
