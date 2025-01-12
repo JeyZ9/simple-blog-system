@@ -38,7 +38,7 @@ public class Blog {
     @NotNull(message = "User cannot be empty")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
+    private User users;
 
     @NotNull(message = "Category cannot be empty")
     @ManyToOne
@@ -53,17 +53,17 @@ public class Blog {
 //    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();
 
-    @JsonIgnore
+//    @JsonIgnore
 //    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL)
-    @OneToMany(cascade = CascadeType.ALL)
-//    private Save saves;
-    private Set<Save> saves = new HashSet<>();
+//    @OneToMany(cascade = CascadeType.ALL)
+////    private Save saves;
+//    private Set<Save> saves = new HashSet<>();
 
-    public Blog(String title, String imageUrl, String description, User user, Category category, String dateTime) {
+    public Blog(String title, String imageUrl, String description, User users, Category category, String dateTime) {
         this.title = title;
         this.imageUrl = imageUrl;
         this.description = description;
-        this.user = user;
+        this.users = users;
         this.category = category;
         this.dateTime = dateTime;
     }

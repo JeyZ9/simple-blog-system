@@ -1,6 +1,5 @@
 package com.app.simpleblogsystem.repository;
 
-import com.app.simpleblogsystem.dto.save.SaveDTO;
 import com.app.simpleblogsystem.models.Save;
 import com.app.simpleblogsystem.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;

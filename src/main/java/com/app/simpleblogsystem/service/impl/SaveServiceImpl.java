@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,12 +35,12 @@ public class SaveServiceImpl implements SaveService {
         this.modelMapper = modelMapper;
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<SaveDTO> getAllSave(){
-        List<Save> saveList = saveRepository.findAll();
-        return saveList.stream().map(this::mapToSaveDTO).collect(Collectors.toList());
-    }
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<SaveDTO> getAllSave(){
+//        List<Save> saveList = saveRepository.findAll();
+//        return saveList.stream().map(this::mapToSaveDTO).collect(Collectors.toList());
+//    }
 
     @Override
     @Transactional(readOnly = true)
@@ -52,21 +52,22 @@ public class SaveServiceImpl implements SaveService {
 
     @Override
     @Transactional
-//    public UserSaveBlogsDTO saveBlogs(Long userId,  Long blogId, UserSaveBlogsDTO userSaveBlogsDTO){
-    public UserSaveBlogsDTO saveBlogs(UserSaveBlogsDTO userSaveBlogsDTO){
-        User user = userRepository.findById(userSaveBlogsDTO.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User", "id", userSaveBlogsDTO.getUserId()));
-        Blog blog = blogRepository.findById(userSaveBlogsDTO.getBlogId()).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", userSaveBlogsDTO.getBlogId()));
-        // ตรวจสอบว่ามี Save ที่เกี่ยวข้องอยู่แล้วหรือไม่
-        Save save = saveRepository.findByUsers(user)
-                .orElseGet(() -> {
-                    Save newSave = new Save();
-                    newSave.setUsers(user);
-                    return newSave;
-                });
-//        if (!save.getBlogs().contains(blog)) {
-//            save.getBlogs().add(blog);
-//        }
-        save.setBlogs(blog);
+    public UserSaveBlogsDTO saveBlogs(UserSaveBlogsDTO userSaveBlogsDTO) {
+        User user = userRepository.findById(userSaveBlogsDTO.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userSaveBlogsDTO.getUserId()));
+        Blog blog = blogRepository.findById(userSaveBlogsDTO.getBlogId().iterator().next())
+                .orElseThrow(() -> new ResourceNotFoundException("Blog", "id", userSaveBlogsDTO.getBlogId().iterator().next()));
+
+        // ค้นหา Save Entity ที่เกี่ยวข้องกับ User
+        Save save = saveRepository.findByUsers(user).orElse(new Save(user));
+
+        // ตรวจสอบและเพิ่ม Blog หากยังไม่มีในเซต
+        if (save.getBlogs() == null) {
+            save.setBlogs(new HashSet<>());
+        }
+        if (!save.getBlogs().contains(blog)) {
+            save.getBlogs().add(blog);
+        }
         Save newSave = saveRepository.save(save);
         return mapToUserSaveDTO(newSave);
     }
@@ -76,36 +77,40 @@ public class SaveServiceImpl implements SaveService {
 //        Save save = saveRepository.findBySaveIdAndUserIdAndBlogId(saveId, userId, blogId).orElseThrow(() -> new ResourceNotFoundException("Save", "id", saveId));
 //        saveRepository.delete(save);
 //    }
+
     @Override
-    public void deleteBlogFromSave(Long saveId, Long userId, Long blogId){
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        Save save = saveRepository.findByUsers(user).orElseThrow(() -> new ResourceNotFoundException("Save", "id", saveId));
-        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
-//        if (save.getBlogs().contains(blog)) {
-//            save.getBlogs().remove(blog);
-//
-//            if (save.getBlogs().isEmpty()) {
-//                saveRepository.delete(save);
-//            } else {
-//                saveRepository.save(save);
-//            }
-//        } else {
-//            throw new ResourceNotFoundException("Blog", "id", blogId);
-//        }
-//        Save saves = saveRepository.findByBlogs(save).orElseThrow(())
-//        saveRepository.delete(save);
+    public UserSaveBlogsDTO deleteBlogFromSave(UserSaveBlogsDTO userSave){
+        User user = userRepository.findById(userSave.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User", "id", userSave.getUserId()));
+        Save save = saveRepository.findByUsers(user).orElseThrow(() -> new ResourceNotFoundException("Save", "id", user.getSave().iterator().next().getId()));
+        Blog blog = blogRepository.findById(userSave.getBlogId().iterator().next()).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", userSave.getBlogId().iterator().next()));
+
+        if(save.getBlogs() != null && save.getBlogs().contains(blog)){
+            save.getBlogs().remove(blog);
+            saveRepository.save(save);
+        }else{
+            throw new ResourceNotFoundException("Blog", "id", blog.getId());
+        }
+
+        return mapToUserSaveDTO(save);
     }
 
-    private Save mapToSave(UserSaveBlogsDTO userSaveBlogsDTO){
-        return modelMapper.map(userSaveBlogsDTO, Save.class);
-    }
+//    private Save mapToSave(UserSaveBlogsDTO userSaveBlogsDTO){
+//        return modelMapper.map(userSaveBlogsDTO, Save.class);
+//    }
 
     private SaveDTO mapToSaveDTO(Save save){
         return modelMapper.map(save, SaveDTO.class);
     }
 
-    private UserSaveBlogsDTO mapToUserSaveDTO(Save save){
-        return modelMapper.map(save, UserSaveBlogsDTO.class);
+//    private UserSaveBlogsDTO mapToUserSaveDTO(Save save){
+//        return modelMapper.map(save, UserSaveBlogsDTO.class);
+//    }
+
+    private UserSaveBlogsDTO mapToUserSaveDTO(Save save) {
+        UserSaveBlogsDTO dto = new UserSaveBlogsDTO();
+        dto.setUserId(save.getUsers().getId());
+        dto.setBlogId(save.getBlogs().stream().map(Blog::getId).collect(Collectors.toSet()));
+        return dto;
     }
 
 

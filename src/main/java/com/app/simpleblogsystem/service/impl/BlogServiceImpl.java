@@ -8,6 +8,7 @@ import com.app.simpleblogsystem.models.Category;
 import com.app.simpleblogsystem.models.User;
 import com.app.simpleblogsystem.repository.*;
 import com.app.simpleblogsystem.service.BlogService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -30,6 +32,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogRepository blogRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
 //    private final ModelMapper modelMapper;
 //    private final CategoryRepository categoryRepository;
 //    private final LikeRepository likeRepository;
@@ -38,10 +41,11 @@ public class BlogServiceImpl implements BlogService {
     private String uploadDir;
 
     @Autowired
-    public  BlogServiceImpl(BlogRepository blogRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
+    public  BlogServiceImpl(BlogRepository blogRepository, UserRepository userRepository, CategoryRepository categoryRepository, ModelMapper modelMapper) {
         this.blogRepository = blogRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.modelMapper = modelMapper;
     }
 //    public  BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, LikeRepository likeRepository) {
 //        this.blogRepository = blogRepository;
@@ -50,64 +54,84 @@ public class BlogServiceImpl implements BlogService {
 //        this.likeRepository = likeRepository;
 //    }
 
+//    @Override
+//    public List<BlogDTO> getAllBlog(){
+//        List<Blog> blogList = blogRepository.findAll();
+//        List<BlogDTO> blogDTOs = new ArrayList<>();
+//        for(Blog blog : blogList){
+//            BlogDTO blogDTO = new BlogDTO();
+////            List<Like> like = likeRepository.findAllByBlogs(blog);
+////            List<LikeDTO> likeDTO = like.stream().map(i -> new LikeDTO(i.getId(), i.getUsers().getUsername(), i.getIsLiked())).collect(Collectors.toList());
+//            blogDTO.setId(blog.getId());
+//            blogDTO.setWriter(blog.getUser().getUsername());
+//            blogDTO.setTitle(blog.getTitle());
+//            blogDTO.setCategory(blog.getCategory());
+//            blogDTO.setDescription(blog.getDescription());
+//            blogDTO.setCreatedDate(blog.getDateTime());
+////            blogDTO.setLikes(likeDTO);
+//            blogDTO.setImageUrl(blog.getImageUrl());
+//            blogDTOs.add(blogDTO);
+//        }
+//        return blogDTOs;
+//    }
+
+//    @Override
+//    public List<BlogDTO> getBlogByUserId(Long userId) {
+//        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+//        List<Blog> blogList = blogRepository.findAllByUserId(user.getId());
+//        List<BlogDTO> blogDTOs = new ArrayList<>();
+//        for(Blog blog : blogList){
+//            BlogDTO blogDTO = new BlogDTO();
+//            blogDTO.setId(blog.getId());
+//            blogDTO.setWriter(blog.getUser().getUsername());
+//            blogDTO.setTitle(blog.getTitle());
+//            blogDTO.setCategory(blog.getCategory());
+//            blogDTO.setDescription(blog.getDescription());
+//            blogDTO.setCreatedDate(blog.getDateTime());
+//            blogDTO.setImageUrl(blog.getImageUrl());
+//            blogDTOs.add(blogDTO);
+//        }
+//        return blogDTOs;
+//    }
+
     @Override
     public List<BlogDTO> getAllBlog(){
         List<Blog> blogList = blogRepository.findAll();
-        List<BlogDTO> blogDTOs = new ArrayList<>();
-        for(Blog blog : blogList){
-            BlogDTO blogDTO = new BlogDTO();
-//            List<Like> like = likeRepository.findAllByBlogs(blog);
-//            List<LikeDTO> likeDTO = like.stream().map(i -> new LikeDTO(i.getId(), i.getUsers().getUsername(), i.getIsLiked())).collect(Collectors.toList());
-            blogDTO.setId(blog.getId());
-            blogDTO.setWriter(blog.getUser().getUsername());
-            blogDTO.setTitle(blog.getTitle());
-            blogDTO.setCategory(blog.getCategory());
-            blogDTO.setDescription(blog.getDescription());
-            blogDTO.setCreatedDate(blog.getDateTime());
-//            blogDTO.setLikes(likeDTO);
-            blogDTO.setImageUrl(blog.getImageUrl());
-            blogDTOs.add(blogDTO);
-        }
-        return blogDTOs;
+        return blogList.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<BlogDTO> getBlogByUserId(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        List<Blog> blogList = blogRepository.findAllByUserId(user.getId());
-        List<BlogDTO> blogDTOs = new ArrayList<>();
-        for(Blog blog : blogList){
-            BlogDTO blogDTO = new BlogDTO();
-            blogDTO.setId(blog.getId());
-            blogDTO.setWriter(blog.getUser().getUsername());
-            blogDTO.setTitle(blog.getTitle());
-            blogDTO.setCategory(blog.getCategory());
-            blogDTO.setDescription(blog.getDescription());
-            blogDTO.setCreatedDate(blog.getDateTime());
-            blogDTO.setImageUrl(blog.getImageUrl());
-            blogDTOs.add(blogDTO);
-        }
-        return blogDTOs;
+        List<Blog> blog = blogRepository.findAllByUsersId(user.getId());
+        return blog.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<BlogDTO> getBlogByCategoryId(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("category", "id", categoryId));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
         List<Blog> blogList = blogRepository.findAllByCategoryId(category.getId());
-        List<BlogDTO> blogDTOs = new ArrayList<>();
-        for(Blog blog : blogList){
-            BlogDTO blogDTO = new BlogDTO();
-            blogDTO.setId(blog.getId());
-            blogDTO.setWriter(blog.getUser().getUsername());
-            blogDTO.setTitle(blog.getTitle());
-            blogDTO.setCategory(blog.getCategory());
-            blogDTO.setDescription(blog.getDescription());
-            blogDTO.setCreatedDate(blog.getDateTime());
-            blogDTO.setImageUrl(blog.getImageUrl());
-            blogDTOs.add(blogDTO);
-        }
-        return blogDTOs;
+        return blogList.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
+
+//    @Override
+//    public List<BlogDTO> getBlogByCategoryId(Long categoryId) {
+//        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("category", "id", categoryId));
+//        List<Blog> blogList = blogRepository.findAllByCategoryId(category.getId());
+//        List<BlogDTO> blogDTOs = new ArrayList<>();
+//        for(Blog blog : blogList){
+//            BlogDTO blogDTO = new BlogDTO();
+//            blogDTO.setId(blog.getId());
+//            blogDTO.setWriter(blog.getUser().getUsername());
+//            blogDTO.setTitle(blog.getTitle());
+//            blogDTO.setCategory(blog.getCategory());
+//            blogDTO.setDescription(blog.getDescription());
+//            blogDTO.setCreatedDate(blog.getDateTime());
+//            blogDTO.setImageUrl(blog.getImageUrl());
+//            blogDTOs.add(blogDTO);
+//        }
+//        return blogDTOs;
+//    }
 
     @Override
     public Optional<Blog> getBlogById(Long id){
@@ -119,8 +143,12 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public Blog createBlog(Blog blog, MultipartFile image) throws IOException {
+    public Blog createBlog(Long userId, Long categoryId, Blog blog, MultipartFile image) throws IOException {
 //        Blog newBlog = new Blog();
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+        blog.setUsers(user);
+        blog.setCategory(category);
         if(image.isEmpty()) {
             blog.setImageUrl("noimg.jpg");
         }else{
@@ -130,20 +158,21 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public Blog updateBlog(Long id, Blog blog, MultipartFile image) throws IOException {
+    public Blog updateBlog(Long id, Long userId, Long categoryId, Blog blog, MultipartFile image) throws IOException {
         Blog findBlog = blogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id));
-
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
         findBlog.setTitle(blog.getTitle());
         findBlog.setDescription(blog.getDescription());
+        findBlog.setUsers(user);
+        findBlog.setCategory(category);
         if(image != null){
             String newFileName = saveFile(image);
             deleteFile(findBlog.getImageUrl());
             findBlog.setImageUrl(newFileName);
         }
 
-        Blog updateBlog = blogRepository.save(findBlog);
-
-        return updateBlog;
+        return blogRepository.save(findBlog);
     }
 
     @Override
@@ -180,6 +209,14 @@ public class BlogServiceImpl implements BlogService {
                 throw new IOException(e.getMessage());
             }
         }
+    }
+
+//    private Blog mapToBlog(BlogDTO blogDTO){
+//        return modelMapper.map(blogDTO, Blog.class);
+//    }
+
+    private BlogDTO mapToDTO(Blog blog) {
+        return modelMapper.map(blog, BlogDTO.class);
     }
 
 }

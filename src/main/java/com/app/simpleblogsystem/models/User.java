@@ -37,7 +37,7 @@ public class User {
     @JsonIgnore
     private String password;
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Save> save = new HashSet<>();
 //    @JoinColumn(name = "save_id", referencedColumnName = "id")
 //    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)

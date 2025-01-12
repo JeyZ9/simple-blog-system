@@ -40,8 +40,9 @@ public class CategoryService {
         return categoryRepository.save(categoryId);
     }
 
-    public void removeCategory(Long categoryId) {
+    public Category removeCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
         categoryRepository.delete(category);
+        return category;
     }
 }

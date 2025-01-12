@@ -1,5 +1,6 @@
 package com.app.simpleblogsystem.dto;
 
+import com.app.simpleblogsystem.dto.user.UserDTO;
 import com.app.simpleblogsystem.models.Category;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,11 +21,11 @@ public class BlogDTO {
 
     private String description;
 
-    private String writer;
+    private UserDTO users;
 
     private Category category;
 
-    private String createdDate;
+    private String dateTime;
 
 //    private List<CommentDTO> comments;
 

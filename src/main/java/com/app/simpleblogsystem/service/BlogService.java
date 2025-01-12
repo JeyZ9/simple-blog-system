@@ -17,9 +17,9 @@ public interface BlogService {
 
 //    BlogDTO createBlog(BlogDTO blogDTO);
 
-    Blog createBlog(Blog blog, MultipartFile image) throws IOException;
+    Blog createBlog(Long userId, Long categoryId, Blog blog, MultipartFile image) throws IOException;
 
-    Blog updateBlog(Long id, Blog blog, MultipartFile image) throws IOException;
+    Blog updateBlog(Long id, Long userId, Long categoryId, Blog blog, MultipartFile image) throws IOException;
 
     void deleteBlog(Long id);
 
