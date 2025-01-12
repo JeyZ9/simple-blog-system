@@ -46,18 +46,10 @@ public class Blog {
     private Category category;
 
     @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();
-
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "blogs", cascade = CascadeType.ALL)
-//    @OneToMany(cascade = CascadeType.ALL)
-////    private Save saves;
-//    private Set<Save> saves = new HashSet<>();
 
     public Blog(String title, String imageUrl, String description, User users, Category category, String dateTime) {
         this.title = title;
@@ -67,16 +59,4 @@ public class Blog {
         this.category = category;
         this.dateTime = dateTime;
     }
-
-//    public void setTitle(String title) {
-//        this.title = title;
-//    }
-//
-//    public void setDescription(String description) {
-//        this.description = description;
-//    }
-//
-//    public void setImageUrl(String imageUrl) {
-//        this.imageUrl = imageUrl;
-//    }
 }

@@ -8,6 +8,9 @@ import com.app.simpleblogsystem.exception.CustomException;
 
 public interface UserService {
 
-    UserResponseDTO login(LoginDTO login) throws AuthenticationFailException, CustomException;
-    UserResponseDTO register(RegisterDTO register) throws CustomException;
+//    UserResponseDTO login(LoginDTO login) throws AuthenticationFailException, CustomException;
+//    UserResponseDTO register(RegisterDTO register) throws CustomException;
+
+    String register(RegisterDTO register);
+    String login(LoginDTO loginDTO);
 }

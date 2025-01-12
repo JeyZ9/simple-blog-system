@@ -28,4 +28,11 @@ public class RegisterDTO {
     @NotBlank(message = "Confirm Password is required")
     @Size(min = 6, message = "Confirm Password must be at least 6 characters long")
     private String confirmPassword;
+
+    @NotBlank(message = "isAdmin is required")
+    private boolean isAdmin;
+
+    public boolean getIsAdmin() {
+        return isAdmin;
+    }
 }

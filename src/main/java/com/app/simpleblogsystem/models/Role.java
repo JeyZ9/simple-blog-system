@@ -21,9 +21,6 @@ public class Role {
     @Column(name = "role_name")
     private RoleName roleName;
 
-//    @ManyToMany(mappedBy = "roles")
-//    private User user;
-
     public Role(RoleName roleName) {
         this.roleName = roleName;
     }

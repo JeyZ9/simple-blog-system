@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -18,5 +17,4 @@ public class SaveDTO {
     private Long id;
     private UserDTO users;
     private Set<BlogDTO> blogs;
-//    private String blogTitle;
 }

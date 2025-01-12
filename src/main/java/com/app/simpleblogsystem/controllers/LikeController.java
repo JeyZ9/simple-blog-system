@@ -3,7 +3,6 @@ package com.app.simpleblogsystem.controllers;
 import com.app.simpleblogsystem.config.ApiResponse;
 import com.app.simpleblogsystem.config.MessageStrings;
 import com.app.simpleblogsystem.dto.LikeDTO;
-import com.app.simpleblogsystem.models.Like;
 import com.app.simpleblogsystem.service.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

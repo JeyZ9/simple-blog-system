@@ -39,9 +39,6 @@ public class User {
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Save> save = new HashSet<>();
-//    @JoinColumn(name = "save_id", referencedColumnName = "id")
-//    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Save> save = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -55,6 +52,5 @@ public class User {
         this.username = username;
         this.email = email;
         this.password = password;
-//        this.roles = roles;
     }
 }

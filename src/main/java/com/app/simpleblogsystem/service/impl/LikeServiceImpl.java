@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +35,6 @@ public class LikeServiceImpl implements LikeService {
     }
 
     @Override
-//    @Transactional(readOnly = true)
     public List<LikeDTO> getLikeByBlogId(Long blogId) {
         Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
         List<Like> likeList = likeRepository.findAllByBlogs_Id(blog.getId());
@@ -56,21 +54,6 @@ public class LikeServiceImpl implements LikeService {
         return mapToDTO(newLike);
     }
 
-//    @Override
-//    @Transactional
-//    public LikeDTO updateLike(Long likeId, Long blogId, Long userId, LikeDTO likeDTO){
-//        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
-////        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-////        Like like = likeRepository.findLike(likeId, blog.getId(), user.getId());
-//        Like like = likeRepository.findLike(blog.getId());
-//        if(Objects.isNull(like)){
-//            throw new ResourceNotFoundException("Like", "id", likeId);
-//        }
-//        like.setIsLiked(likeDTO.getIsLiked());
-//        Like updatedLike = likeRepository.save(like);
-//        return mapToDTO(updatedLike);
-//    }
-
     @Override
     @Transactional
     public LikeDTO updateLike(Long blogId, Long likeId, LikeDTO likeDTO, Long userId) throws IOException {
@@ -78,7 +61,6 @@ public class LikeServiceImpl implements LikeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogId));
         Like like = likeRepository.findByBlogs(blog)
                 .orElseThrow(() -> new ResourceNotFoundException("Like", "blogId", blogId));
-//        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         if (!like.getUsers().getId().equals(userId)){
             throw new IOException("UserId is not equal");
         }

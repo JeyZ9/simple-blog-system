@@ -35,13 +35,6 @@ public class SaveServiceImpl implements SaveService {
         this.modelMapper = modelMapper;
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<SaveDTO> getAllSave(){
-//        List<Save> saveList = saveRepository.findAll();
-//        return saveList.stream().map(this::mapToSaveDTO).collect(Collectors.toList());
-//    }
-
     @Override
     @Transactional(readOnly = true)
     public List<SaveDTO> getSaveByUser(Long userId){

@@ -57,27 +57,6 @@ public class CommentController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
- /*
- {
-    "status": 200,
-    "message": "ดึงข้อมูลสำเร็จ",
-    "data": [
-        {
-            "id": 2,
-            "comment": "Test Comment 2",
-            "createdDate": "2568-01-06",
-            "user": {
-                "id": 1,
-                "username": "test"
-            },
-            <-- เพิ่ม field ลบข้อมูล -->
-            is_deleted: "true"
-        }
-    ],
-    "timestamp": "2025-01-06T21:06:48.604176700"
-}
-*/
-
     @DeleteMapping("/blogs/{blogId}/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> removeComment(@PathVariable(value = "blogId") Long blogId, @PathVariable Long commentId) throws IOException {
         Comment comment = commentService.deleteComment(blogId, commentId);

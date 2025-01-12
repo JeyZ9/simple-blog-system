@@ -20,17 +20,11 @@ public class Save {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne(mappedBy = "saves", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User users;
-//    @OneToOne
-//    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-//    private User users;
 
-//    @ManyToOne
-//    @JoinColumn(name = "blogs", referencedColumnName = "id", nullable = false)
     @ManyToMany
     @JoinTable(
             name = "save_blogs",
@@ -38,7 +32,6 @@ public class Save {
             inverseJoinColumns = @JoinColumn(name = "blog_id", nullable = false)
     )
     private Set<Blog> blogs = new HashSet<>();
-//    private List<Blog> blogs = new ArrayList<>();
 
     public Save(User user){
         this.users = user;

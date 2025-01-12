@@ -3,7 +3,6 @@ package com.app.simpleblogsystem.service.impl;
 import com.app.simpleblogsystem.dto.BlogDTO;
 import com.app.simpleblogsystem.exception.ResourceNotFoundException;
 import com.app.simpleblogsystem.models.Blog;
-//import org.modelmapper.ModelMapper;
 import com.app.simpleblogsystem.models.Category;
 import com.app.simpleblogsystem.models.User;
 import com.app.simpleblogsystem.repository.*;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,9 +31,6 @@ public class BlogServiceImpl implements BlogService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
-//    private final ModelMapper modelMapper;
-//    private final CategoryRepository categoryRepository;
-//    private final LikeRepository likeRepository;
 
     @Value("${upload-dir}")
     private String uploadDir;
@@ -47,52 +42,6 @@ public class BlogServiceImpl implements BlogService {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
     }
-//    public  BlogServiceImpl(BlogRepository blogRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, LikeRepository likeRepository) {
-//        this.blogRepository = blogRepository;
-//        this.modelMapper = modelMapper;
-//        this.categoryRepository = categoryRepository;
-//        this.likeRepository = likeRepository;
-//    }
-
-//    @Override
-//    public List<BlogDTO> getAllBlog(){
-//        List<Blog> blogList = blogRepository.findAll();
-//        List<BlogDTO> blogDTOs = new ArrayList<>();
-//        for(Blog blog : blogList){
-//            BlogDTO blogDTO = new BlogDTO();
-////            List<Like> like = likeRepository.findAllByBlogs(blog);
-////            List<LikeDTO> likeDTO = like.stream().map(i -> new LikeDTO(i.getId(), i.getUsers().getUsername(), i.getIsLiked())).collect(Collectors.toList());
-//            blogDTO.setId(blog.getId());
-//            blogDTO.setWriter(blog.getUser().getUsername());
-//            blogDTO.setTitle(blog.getTitle());
-//            blogDTO.setCategory(blog.getCategory());
-//            blogDTO.setDescription(blog.getDescription());
-//            blogDTO.setCreatedDate(blog.getDateTime());
-////            blogDTO.setLikes(likeDTO);
-//            blogDTO.setImageUrl(blog.getImageUrl());
-//            blogDTOs.add(blogDTO);
-//        }
-//        return blogDTOs;
-//    }
-
-//    @Override
-//    public List<BlogDTO> getBlogByUserId(Long userId) {
-//        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-//        List<Blog> blogList = blogRepository.findAllByUserId(user.getId());
-//        List<BlogDTO> blogDTOs = new ArrayList<>();
-//        for(Blog blog : blogList){
-//            BlogDTO blogDTO = new BlogDTO();
-//            blogDTO.setId(blog.getId());
-//            blogDTO.setWriter(blog.getUser().getUsername());
-//            blogDTO.setTitle(blog.getTitle());
-//            blogDTO.setCategory(blog.getCategory());
-//            blogDTO.setDescription(blog.getDescription());
-//            blogDTO.setCreatedDate(blog.getDateTime());
-//            blogDTO.setImageUrl(blog.getImageUrl());
-//            blogDTOs.add(blogDTO);
-//        }
-//        return blogDTOs;
-//    }
 
     @Override
     public List<BlogDTO> getAllBlog(){
@@ -113,25 +62,6 @@ public class BlogServiceImpl implements BlogService {
         List<Blog> blogList = blogRepository.findAllByCategoryId(category.getId());
         return blogList.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
-
-//    @Override
-//    public List<BlogDTO> getBlogByCategoryId(Long categoryId) {
-//        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("category", "id", categoryId));
-//        List<Blog> blogList = blogRepository.findAllByCategoryId(category.getId());
-//        List<BlogDTO> blogDTOs = new ArrayList<>();
-//        for(Blog blog : blogList){
-//            BlogDTO blogDTO = new BlogDTO();
-//            blogDTO.setId(blog.getId());
-//            blogDTO.setWriter(blog.getUser().getUsername());
-//            blogDTO.setTitle(blog.getTitle());
-//            blogDTO.setCategory(blog.getCategory());
-//            blogDTO.setDescription(blog.getDescription());
-//            blogDTO.setCreatedDate(blog.getDateTime());
-//            blogDTO.setImageUrl(blog.getImageUrl());
-//            blogDTOs.add(blogDTO);
-//        }
-//        return blogDTOs;
-//    }
 
     @Override
     public Optional<Blog> getBlogById(Long id){
